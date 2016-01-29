@@ -3,8 +3,13 @@ package com.justingallag.cmueatsforandroid;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
+
+    TextView tvDisplay;
 
     /**
      * Run when the app is launched for the first time - initialize your global variables here!
@@ -17,6 +22,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Log a message to the console - think of this like System.out.println in typical Java
         Log.d("MainActivity", "I'm in onCreate!");
+
+        // Get references to our UI elements
+        tvDisplay = (TextView) findViewById(R.id.tvDisplay);
     }
 
     /**
@@ -45,5 +53,13 @@ public class MainActivity extends AppCompatActivity {
         Log.d("MainActivity", "I'm in onPause!");
 
         super.onPause();
+    }
+
+    /**
+     * Called when the refresh button is clicked. Sets the text display to show the current data.
+     * @param view The button pressed.
+     */
+    public void refreshClick(View view) {
+        tvDisplay.setText("You refreshed! I don't have any data yet though :(");
     }
 }
