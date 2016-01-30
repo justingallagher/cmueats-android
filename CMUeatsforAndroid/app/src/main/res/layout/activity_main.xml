@@ -22,4 +22,9 @@
         android:layout_height="wrap_content"
         android:text="Welcome to Justin's brand new Android app!"
         android:id="@+id/tvDisplay" />
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/lvEateryList" />
 </LinearLayout>
