@@ -17,6 +17,7 @@
         android:layout_marginTop="12dp"
         android:text="Eatery name"
         android:textSize="16sp"
+        android:textColor="@android:color/black"
         android:id="@+id/tvEateryName"/>
 
     <TextView
