@@ -3,11 +3,14 @@ package com.justingallag.cmueatsforandroid;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONObject;
 
@@ -16,10 +19,11 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView tvDisplay;
     ListView lvEateryList;
     ArrayList<Eatery> eateries;
 
@@ -36,24 +40,14 @@ public class MainActivity extends AppCompatActivity {
         Log.d("MainActivity", "I'm in onCreate!");
 
         // Get references to our UI elements
-        tvDisplay = (TextView) findViewById(R.id.tvDisplay);
         lvEateryList = (ListView) findViewById(R.id.lvEateryList);
 
-        // Set some dummy data to start with
-        Calendar oneHourFromNow = Calendar.getInstance();
-        oneHourFromNow.add(Calendar.HOUR, 1);
-
-        Calendar twoHoursFromNow = Calendar.getInstance();
-        twoHoursFromNow.add(Calendar.HOUR, 2);
-
-        eateries = new ArrayList<Eatery>();
-        eateries.add(new Eatery("The Exchange", true, oneHourFromNow));
-        eateries.add(new Eatery("Entropy", false, twoHoursFromNow));
-        eateries.add(new Eatery("Gallo de Oro", false, oneHourFromNow));
 
         // Populate list
+        eateries = new ArrayList<Eatery>();
         EateryListAdapter adapter = new EateryListAdapter(this, eateries);
         lvEateryList.setAdapter(adapter);
+        new DownloadApiDataTask().execute();
     }
 
     /**
@@ -85,11 +79,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Called when the refresh button is clicked. Sets the text display to show the current data.
-     * @param view The button pressed.
+     * Initialize our menu
+     * @param menu The menu to initialize
+     * @return True if and only if we were successful
      */
-    public void refreshClick(View view) {
-        new DownloadApiDataTask().execute();
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_refresh:
+                new DownloadApiDataTask().execute();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     /**
@@ -136,13 +144,27 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(ArrayList<Eatery> result) {
             if (result != null) {
+                // Sort list first by open status, then by name
+                Collections.sort(result, new Comparator<Eatery>() {
+                    @Override
+                    public int compare(Eatery lhs, Eatery rhs) {
+                        if (lhs.isOpen && !rhs.isOpen)
+                            return -1;
+                        if (!lhs.isOpen && rhs.isOpen)
+                            return 1;
+                        return lhs.name.compareTo(rhs.name);
+                    }
+                });
+
                 // Clear the list adapter and refill with our new objects
                 ArrayAdapter adapter = (ArrayAdapter) lvEateryList.getAdapter();
                 adapter.clear();
                 adapter.addAll(result);
-                tvDisplay.setText("Success!");
             } else {
-                tvDisplay.setText("Whoops, something went wrong!");
+                // Show error message
+                Toast.makeText(getApplicationContext(),
+                        "Whoops, something went wrong. Maybe try again?",
+                        Toast.LENGTH_SHORT).show();
             }
         }
     }
