@@ -4,12 +4,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
     TextView tvDisplay;
+    ArrayList<Eatery> eateries;
 
     /**
      * Run when the app is launched for the first time - initialize your global variables here!
@@ -25,6 +28,18 @@ public class MainActivity extends AppCompatActivity {
 
         // Get references to our UI elements
         tvDisplay = (TextView) findViewById(R.id.tvDisplay);
+
+        // Set some dummy data to start with
+        Calendar oneHourFromNow = Calendar.getInstance();
+        oneHourFromNow.add(Calendar.HOUR, 1);
+
+        Calendar twoHoursFromNow = Calendar.getInstance();
+        twoHoursFromNow.add(Calendar.HOUR, 2);
+
+        eateries = new ArrayList<Eatery>();
+        eateries.add(new Eatery("The Exchange", true, oneHourFromNow));
+        eateries.add(new Eatery("Entropy", false, twoHoursFromNow));
+        eateries.add(new Eatery("Gallo de Oro", false, oneHourFromNow));
     }
 
     /**
@@ -60,6 +75,18 @@ public class MainActivity extends AppCompatActivity {
      * @param view The button pressed.
      */
     public void refreshClick(View view) {
-        tvDisplay.setText("You refreshed! I don't have any data yet though :(");
+        String toShow = "";
+
+        for (int i = 0; i < eateries.size(); i++) {
+            Eatery current = eateries.get(i);
+
+            if (current.isOpen) {
+                toShow += current.name + " is OPEN\n";
+            } else {
+                toShow += current.name + " is CLOSED\n";
+            }
+        }
+
+        tvDisplay.setText(toShow);
     }
 }
