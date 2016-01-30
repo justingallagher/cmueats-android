@@ -7,6 +7,9 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -82,18 +85,24 @@ public class MainActivity extends AppCompatActivity {
      * @param view The button pressed.
      */
     public void refreshClick(View view) {
-        String toShow = "";
+        try {
+            // Open connection to the Scottylabs dining-api
+            URL diningApi = new URL("https://apis.scottylabs.org/dining/v1/locations");
+            BufferedReader in = new BufferedReader(new InputStreamReader(diningApi.openStream()));
 
-        for (int i = 0; i < eateries.size(); i++) {
-            Eatery current = eateries.get(i);
-
-            if (current.isOpen) {
-                toShow += current.name + " is OPEN\n";
-            } else {
-                toShow += current.name + " is CLOSED\n";
+            // Read data line by line
+            String inputLine;
+            String data = "";
+            while ((inputLine = in.readLine()) != null) {
+                data += inputLine;
             }
-        }
 
-        tvDisplay.setText(toShow);
+            // Set text display
+            tvDisplay.setText(data);
+
+        } catch (Exception e) {
+            tvDisplay.setText("Whoops, something went wrong.");
+            e.printStackTrace();
+        }
     }
 }
