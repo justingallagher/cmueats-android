@@ -1,5 +1,6 @@
 package com.justingallag.cmueatsforandroid;
 
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -85,24 +86,53 @@ public class MainActivity extends AppCompatActivity {
      * @param view The button pressed.
      */
     public void refreshClick(View view) {
-        try {
-            // Open connection to the Scottylabs dining-api
-            URL diningApi = new URL("https://apis.scottylabs.org/dining/v1/locations");
-            BufferedReader in = new BufferedReader(new InputStreamReader(diningApi.openStream()));
+        new DownloadApiDataTask().execute();
+    }
 
-            // Read data line by line
-            String inputLine;
-            String data = "";
-            while ((inputLine = in.readLine()) != null) {
-                data += inputLine;
+    /**
+     * Asynchronous task that queries the Scottylabs dining API.
+     */
+    private class DownloadApiDataTask extends AsyncTask<Void, Void, String> {
+
+        /**
+         * Code to be executed in another thread.
+         * @param params Parameters passed by execute()
+         * @return The JSON string of result data received from the server.
+         */
+        @Override
+        protected String doInBackground(Void... params) {
+            try {
+                // Open connection to the Scottylabs dining-api
+                URL diningApi = new URL("http://apis.scottylabs.org/dining/v1/locations");
+                BufferedReader in = new BufferedReader(new InputStreamReader(diningApi.openStream()));
+
+                // Read data line by line
+                String inputLine;
+                String data = "";
+                while ((inputLine = in.readLine()) != null) {
+                    data += inputLine;
+                }
+
+                // Set text display
+                return data;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
             }
+        }
 
-            // Set text display
-            tvDisplay.setText(data);
-
-        } catch (Exception e) {
-            tvDisplay.setText("Whoops, something went wrong.");
-            e.printStackTrace();
+        /**
+         * Code to be executed when returning to the main thread
+         * @param result JSON string of result data received from the server.
+         */
+        @Override
+        protected void onPostExecute(String result) {
+            if (result != null) {
+                tvDisplay.setText(result);
+            } else {
+                tvDisplay.setText("Whoops, something went wrong!");
+            }
         }
     }
 }
