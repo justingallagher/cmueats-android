@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.Calendar;
 public class MainActivity extends AppCompatActivity {
 
     TextView tvDisplay;
+    ListView lvEateryList;
     ArrayList<Eatery> eateries;
 
     /**
@@ -28,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Get references to our UI elements
         tvDisplay = (TextView) findViewById(R.id.tvDisplay);
+        lvEateryList = (ListView) findViewById(R.id.lvEateryList);
 
         // Set some dummy data to start with
         Calendar oneHourFromNow = Calendar.getInstance();
@@ -40,6 +43,10 @@ public class MainActivity extends AppCompatActivity {
         eateries.add(new Eatery("The Exchange", true, oneHourFromNow));
         eateries.add(new Eatery("Entropy", false, twoHoursFromNow));
         eateries.add(new Eatery("Gallo de Oro", false, oneHourFromNow));
+
+        // Populate list
+        EateryListAdapter adapter = new EateryListAdapter(this, eateries);
+        lvEateryList.setAdapter(adapter);
     }
 
     /**
