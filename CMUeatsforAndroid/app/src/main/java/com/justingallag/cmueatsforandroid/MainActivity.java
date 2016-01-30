@@ -5,8 +5,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -92,15 +95,15 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Asynchronous task that queries the Scottylabs dining API.
      */
-    private class DownloadApiDataTask extends AsyncTask<Void, Void, String> {
+    private class DownloadApiDataTask extends AsyncTask<Void, Void, ArrayList<Eatery>> {
 
         /**
          * Code to be executed in another thread.
          * @param params Parameters passed by execute()
-         * @return The JSON string of result data received from the server.
+         * @return An array of the Eatery objects returned by the Dining API.
          */
         @Override
-        protected String doInBackground(Void... params) {
+        protected ArrayList<Eatery> doInBackground(Void... params) {
             try {
                 // Open connection to the Scottylabs dining-api
                 URL diningApi = new URL("http://apis.scottylabs.org/dining/v1/locations");
@@ -113,8 +116,12 @@ public class MainActivity extends AppCompatActivity {
                     data += inputLine;
                 }
 
-                // Set text display
-                return data;
+                // Convert data into Java objects
+                JSONObject json = new JSONObject(data);
+                ArrayList<Eatery> newEateries = Eatery.fromJson(json.getJSONArray("locations"));
+
+                // Return set of eateries
+                return newEateries;
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -124,12 +131,16 @@ public class MainActivity extends AppCompatActivity {
 
         /**
          * Code to be executed when returning to the main thread
-         * @param result JSON string of result data received from the server.
+         * @param result An array of the Eatery objects returned by the Dining API.
          */
         @Override
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(ArrayList<Eatery> result) {
             if (result != null) {
-                tvDisplay.setText(result);
+                // Clear the list adapter and refill with our new objects
+                ArrayAdapter adapter = (ArrayAdapter) lvEateryList.getAdapter();
+                adapter.clear();
+                adapter.addAll(result);
+                tvDisplay.setText("Success!");
             } else {
                 tvDisplay.setText("Whoops, something went wrong!");
             }

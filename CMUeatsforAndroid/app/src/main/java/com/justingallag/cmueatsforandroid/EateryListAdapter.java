@@ -53,7 +53,7 @@ public class EateryListAdapter extends ArrayAdapter<Eatery> {
         TextView tvEateryStatus = (TextView) convertView.findViewById(R.id.tvEateryStatus);
 
         // Calculate time of next closing/opening
-        SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE 'at' h:mm a");
         String time = sdf.format(eatery.nextChange.getTime());
 
         // Set fields
@@ -61,10 +61,10 @@ public class EateryListAdapter extends ArrayAdapter<Eatery> {
 
         if (eatery.isOpen) {
             openIndicator.setBackgroundColor(OPEN_COLOR);
-            tvEateryStatus.setText("Closes at " + time);
+            tvEateryStatus.setText("Closes " + time);
         } else {
             openIndicator.setBackgroundColor(CLOSED_COLOR);
-            tvEateryStatus.setText("Opens at " + time);
+            tvEateryStatus.setText("Opens " + time);
         }
 
         // Return completed view
